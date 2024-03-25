@@ -5,7 +5,11 @@ namespace ScreenSound.Filtros;
 
 internal class MusicFilter
 {
-    public static void FiltrarGeneros(List<Music> musicas)
+
+    
+    
+
+    public static void FiltrarPorGeneros(List<Music> musicas)
     {
         var generos  = musicas.Select(generos => generos.Genero).Distinct().ToList();
 
@@ -51,5 +55,23 @@ internal class MusicFilter
             if(!(genero.Equals("") || genero.Equals(" ")))
                 Console.WriteLine($"- {artista}");
         }
+    } 
+
+
+    public static void MusicasEmCSharp(List<Music> musicas)
+    {
+        var musicasDeDoSustenido = musicas
+            .Where(musica => musica.Tonalidade.Equals("C#"))
+            .Select(musicas => musicas.Nome)
+            .Distinct() .ToList();
+
+        Console.WriteLine("Musicas em C#:\n");
+
+        foreach (var musica in musicasDeDoSustenido)
+        {
+            Console.WriteLine($"- Musica: {musica}");
+        }
     }
+
+
 }
