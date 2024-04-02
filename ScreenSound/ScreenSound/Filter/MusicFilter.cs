@@ -1,17 +1,14 @@
-﻿
-using ScreenSound.Modelos;
+﻿using ScreenSound.Modelos;
 
-namespace ScreenSound.Filtros;
+namespace ScreenSound.Filter;
 
 internal class MusicFilter
 {
 
-    
-    
 
     public static void FiltrarPorGeneros(List<Music> musicas)
     {
-        var generos  = musicas.Select(generos => generos.Genero).Distinct().ToList();
+        var generos = musicas.Select(generos => generos.Genero).Distinct().ToList();
 
 
         Console.WriteLine($"Total de generos: {generos.Count}");
@@ -30,14 +27,14 @@ internal class MusicFilter
         }
     }
 
-    public static void OrdenarArtistas( List<Music> musicas)
+    public static void OrdenarArtistas(List<Music> musicas)
     {
         var ArtistasOrdenadas = musicas
             .OrderBy(musicas => musicas.Artista)
             .Select(m => m.Artista)
             .Distinct().ToList();
 
-        foreach(var item in ArtistasOrdenadas)
+        foreach (var item in ArtistasOrdenadas)
         {
             Console.WriteLine($"- {item}");
         }
@@ -48,14 +45,14 @@ internal class MusicFilter
         var artistasPorGeneros = musicas
             .Where(artista => artista.Genero.Contains(genero))
             .Select(artista => artista.Artista)
-            .Distinct() .ToList();
+            .Distinct().ToList();
 
-        foreach( var artista in artistasPorGeneros)
+        foreach (var artista in artistasPorGeneros)
         {
-            if(!(genero.Equals("") || genero.Equals(" ")))
+            if (!(genero.Equals("") || genero.Equals(" ")))
                 Console.WriteLine($"- {artista}");
         }
-    } 
+    }
 
 
     public static void MusicasEmCSharp(List<Music> musicas)
@@ -63,7 +60,7 @@ internal class MusicFilter
         var musicasDeDoSustenido = musicas
             .Where(musica => musica.Tonalidade.Equals("C#"))
             .Select(musicas => musicas.Nome)
-            .Distinct() .ToList();
+            .Distinct().ToList();
 
         Console.WriteLine("Musicas em C#:\n");
 
