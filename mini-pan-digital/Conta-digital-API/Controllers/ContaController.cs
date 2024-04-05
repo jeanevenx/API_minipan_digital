@@ -1,5 +1,12 @@
-﻿using Conta_digital_API.Models;
+﻿using AutoMapper;
+using Conta_digital_API.Data;
+using Conta_digital_API.DTOs;
+using Conta_digital_API.Models;
+using Conta_digital_API.Services;
+using Conta_digital_API.Services.Impl;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Conta_digital_API.Controllers;
 
@@ -7,35 +14,61 @@ namespace Conta_digital_API.Controllers;
 [Route("api/v1/[Controller]")]
 public class ContaController : ControllerBase
 {
+    private  MinipanContext _context;
+    private  IMapper _mapper;
 
-    public static List<Conta> contas = new List<Conta>();
-    public static int id = 0;
+
+    public ContaController(MinipanContext context, IMapper mapper)
+    {
+        _context = context;
+        _mapper = mapper;
+    }
+
+
 
     [HttpPost]
-    public IActionResult AbrirConta([FromBody] Conta conta)
+    public IActionResult AbrirConta([FromBody] CreateContaDTO contaDTO)
     {
-
-        Conta novaConta = new()
+        var cliente = new Cliente
         {
-            Id = id++,
-            Usuario = conta.Usuario,
+            Nome = contaDTO.Cliente.Nome,
+            Cpf = contaDTO.Cliente.Cpf
         };
 
-        novaConta.Usuario.ClienteID = Guid.NewGuid();
+        
 
 
+        var conta = new Conta
+        {
+            Usuario = cliente
+        };
 
-        contas.Add(novaConta);
+        conta.GerarContaCorrente();
 
-        return CreatedAtAction(nameof(RecuperarContaPorId), new {novaConta.Id }, novaConta);
+        if (conta != null)
+        {
+            _context.Contas.Add(conta);
+            _context.SaveChanges();
+        }
+        else
+        {
+            return BadRequest("CPF é nulo");
+        }
+
+
+       return CreatedAtAction(nameof(RecuperarContaPorId), new { conta.Id }, conta);
 
     }
 
     [HttpGet]
-    public IActionResult RecuperarContas([FromQuery] int offset = 0, [FromQuery] int limit = 20)
+    public ActionResult<IEnumerable<Conta>> RecuperarContas([FromQuery] int offset = 0, [FromQuery] int limit = 20)
     {
 
-        var listaDecontas = contas.Skip(offset).Take(limit);
+        var listaDecontas = _context.Contas
+            .Skip(offset)
+            .Take(limit)
+            .Include(conta => conta.Usuario)
+            .ToList();
 
         if(listaDecontas != null) return Ok(listaDecontas);
         return NotFound();
@@ -47,7 +80,7 @@ public class ContaController : ControllerBase
     [HttpGet("{Id}")]
     public IActionResult RecuperarContaPorId(int id)
     {
-        var conta = contas.FirstOrDefault(conta => conta.Id == id);
+        var conta = _context.Contas.Include(conta => conta.Usuario).FirstOrDefault(conta => conta.Id == id);
 
         if(conta == null) return NotFound();
         return Ok(conta);

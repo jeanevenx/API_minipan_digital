@@ -1,4 +1,17 @@
+using Conta_digital_API.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+
+
+// Connection with db
+var connectionString = builder.Configuration.GetConnectionString("MinipanConnection");
+
+builder.Services.AddDbContext<MinipanContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add services to the container.
 
